@@ -15,11 +15,13 @@ const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
 
 <template>
   <main class="grid place-items-center w-screen h-screen">
-    <Token v-if="isTokenStep" />
-    <BranchSelector v-if="isBranchStep" />
-    <TemplateSelector v-if="isTemplateStep" />
-    <ChatAi v-if="isChatStep" />
-    <Preview v-if="isReviewStep" />
+    <div class="w-8/12 h-8/12 min-w[500px] overflow-auto">
+      <Token v-if="isTokenStep" />
+      <BranchSelector v-if="isBranchStep" />
+      <TemplateSelector v-if="isTemplateStep" />
+      <ChatAi v-if="isChatStep" />
+      <Preview v-if="isReviewStep" />
+    </div>
 
     <StickedFooter />
   </main>
