@@ -1,21 +1,32 @@
 import { defineStore } from "pinia";
-import { ProcessStepEnum, type ProcessStep } from "../types/process";
+import { ProcessStepEnum, type ProcessStepType } from "../types/process";
+
+type ProjectType = { 
+  id: number, 
+  label: string
+}
+
+type TemplateType = { 
+  id: number, label: string
+}
 
 type ProcessStateType = {
-  step: ProcessStep;
-  projectId: number;
+  step: ProcessStepType;
+  pat: string,
+  project: ProjectType;
   originBranch: string;
   targetBranch: string;
-  templateId: number;
+  template: TemplateType;
 };
 
 export const useProcess = defineStore("process", {
   state: (): ProcessStateType => ({
     step: ProcessStepEnum.TOKEN,
-    projectId: 0,
+    pat: '',
+    project: {} as ProjectType,
     originBranch: "",
     targetBranch: "",
-    templateId: 0,
+    template: {} as TemplateType,
   }),
   getters: {
     isTokenStep: (s) => s.step == ProcessStepEnum.TOKEN,

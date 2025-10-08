@@ -6,5 +6,5 @@ export const ProcessStepEnum = {
   REVIEW: "REVIEW",
 };
 
-export type ProcessStep =
+export type ProcessStepType =
   (typeof ProcessStepEnum)[keyof typeof ProcessStepEnum];

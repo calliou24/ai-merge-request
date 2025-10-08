@@ -11,6 +11,12 @@ import CardFooter from "@/components/ui/card/CardFooter.vue";
 import { CheckCircle } from "lucide-vue-next";
 import { ref } from "vue";
 import ButtonWithLoader from "@/components/ui/button/ButtonWithLoader.vue";
+import { useProcess } from "@/stores/process.store";
+import { storeToRefs } from "pinia";
+
+const process = useProcess();
+
+const { pat } = storeToRefs(process);
 
 let isLogged = ref(false);
 
@@ -40,7 +46,10 @@ const handleAuth = async () => {
           class="grid gap-2"
         >
           <Label>Gitlab PAT</Label>
-          <Input placeholder="glpat-xxxxxxx" />
+          <Input
+            v-model="pat"
+            placeholder="glpat-xxxxxxx"
+          />
         </form>
         <div
           v-if="isLogged"

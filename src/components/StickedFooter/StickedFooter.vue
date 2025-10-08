@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { Button } from "@/components/ui/button";
 import { useProcess } from "@/stores/process.store";
-import { ProcessStepEnum } from "@/types/process";
+import { ProcessStepEnum, type ProcessStepType } from "@/types/process";
 import { storeToRefs } from "pinia";
 
 const process = useProcess();
 
-const { step } = storeToRefs(process);
+const { step, pat, originBranch, targetBranch, template } =
+  storeToRefs(process);
 
-const StepsActions = {
+type StepActionsType = {
+  preview: ProcessStepType;
+  next: ProcessStepType;
+  stepCount: number;
+};
+
+const StepsActions: Record<ProcessStepType, StepActionsType> = {
   [ProcessStepEnum.TOKEN]: {
-    preview: "",
+    preview: ProcessStepEnum.TOKEN,
     next: ProcessStepEnum.BRANCH,
     stepCount: 1,
   },
@@ -19,27 +26,35 @@ const StepsActions = {
     next: ProcessStepEnum.TEMPLATE,
     stepCount: 2,
   },
-  [ProcessStepEnum.TEMPLATE]: {
-    preview: ProcessStepEnum.BRANCH,
-    next: ProcessStepEnum.CHAT,
-    stepCount: 3,
-  },
   [ProcessStepEnum.CHAT]: {
     preview: ProcessStepEnum.TEMPLATE,
     next: ProcessStepEnum.REVIEW,
-    stepCount: 4,
+    stepCount: 3,
   },
   [ProcessStepEnum.REVIEW]: {
     preview: ProcessStepEnum.CHAT,
-    next: "",
-    stepCount: 5,
+    next: ProcessStepEnum.REVIEW,
+    stepCount: 4,
   },
 };
 
 const handleChangeStep = (action: "preview" | "next") => {
-  const actionView = StepsActions[step.value][action];
+  const stepEntity = StepsActions[step.value];
+
+  const actionView = stepEntity[action];
 
   if (actionView == "") return;
+
+  const stepValidations: Record<number, any[]> = {
+    1: [pat.value],
+    2: [pat.value, originBranch.value, targetBranch.value],
+    3: [pat.value, originBranch.value, targetBranch.value, template.value.id],
+    4: [],
+  };
+
+  for (const field of stepValidations[stepEntity.stepCount]) {
+    if (!field || !field.length) return;
+  }
 
   return (process.step = actionView);
 };
@@ -57,6 +72,15 @@ const handleChangeStep = (action: "preview" | "next") => {
       Back
     </Button>
     <p class="text-gray-500">Step {{ StepsActions[step].stepCount }} of 5</p>
-    <Button class="w-30" @click="() => handleChangeStep('next')">Next</Button>
+    <Button
+      :disabled="
+        originBranch == targetBranch &&
+        originBranch.length &&
+        targetBranch.length
+      "
+      class="w-30"
+      @click="() => handleChangeStep('next')"
+      >Next</Button
+    >
   </footer>
 </template>

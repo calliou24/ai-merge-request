@@ -15,7 +15,7 @@ const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
 
 <template>
   <main class="grid place-items-center w-screen h-screen">
-    <div class="w-8/12 h-8/12 min-w[500px] overflow-auto">
+    <div class="w-10/12 h-fit-content min-w[500px] overflow-auto">
       <Token v-if="isTokenStep" />
       <BranchSelector v-if="isBranchStep" />
       <TemplateSelector v-if="isTemplateStep" />
