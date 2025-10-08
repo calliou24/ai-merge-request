@@ -45,6 +45,8 @@ const handleChangeStep = (action: "preview" | "next") => {
 
   if (actionView == "") return;
 
+  if (action == "preview") return (process.step = actionView);
+
   const stepValidations: Record<number, any[]> = {
     1: [pat.value],
     2: [pat.value, originBranch.value, targetBranch.value],
