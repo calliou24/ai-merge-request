@@ -46,14 +46,11 @@ const handleAuth = async () => {
           class="grid gap-2"
         >
           <Label>Gitlab PAT</Label>
-          <Input
-            v-model="pat"
-            placeholder="glpat-xxxxxxx"
-          />
+          <Input v-model="pat" placeholder="glpat-xxxxxxx" />
         </form>
         <div
           v-if="isLogged"
-          class="flex items-center gap-2 border border-green-600, bg-green-600/10 rounded-2xl p-5"
+          class="flex items-center gap-2 border border-green-600, bg-green-300/10 rounded-2xl p-5"
         >
           <CheckCircle class="text-green-600" />
           <p class="font-semibold">Conected successfully</p>

@@ -6,9 +6,9 @@ type SectionTitleProps = {
 defineProps<SectionTitleProps>();
 </script>
 <template>
-  <header>
+  <header class="grid gap-2">
     <h1 class="text-3xl font-bold">{{ title }}</h1>
-    <p class="text-gray-500">
+    <p class="text-black/60">
       {{ description }}
     </p>
   </header>

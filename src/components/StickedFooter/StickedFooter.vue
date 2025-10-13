@@ -6,8 +6,7 @@ import { storeToRefs } from "pinia";
 
 const process = useProcess();
 
-const { step, pat, originBranch, targetBranch, template } =
-  storeToRefs(process);
+const { step, originBranch, targetBranch } = storeToRefs(process);
 
 type StepActionsType = {
   preview: ProcessStepType;
@@ -24,6 +23,11 @@ const StepsActions: Record<ProcessStepType, StepActionsType> = {
   [ProcessStepEnum.BRANCH]: {
     preview: ProcessStepEnum.TOKEN,
     next: ProcessStepEnum.TEMPLATE,
+    stepCount: 2,
+  },
+  [ProcessStepEnum.TEMPLATE]: {
+    preview: ProcessStepEnum.BRANCH,
+    next: ProcessStepEnum.CHAT,
     stepCount: 2,
   },
   [ProcessStepEnum.CHAT]: {
@@ -43,20 +47,20 @@ const handleChangeStep = (action: "preview" | "next") => {
 
   const actionView = stepEntity[action];
 
-  if (actionView == "") return;
+  // if (actionView == "") return;
 
-  if (action == "preview") return (process.step = actionView);
+  // if (action == "preview") return (process.step = actionView);
 
-  const stepValidations: Record<number, any[]> = {
-    1: [pat.value],
-    2: [pat.value, originBranch.value, targetBranch.value],
-    3: [pat.value, originBranch.value, targetBranch.value, template.value.id],
-    4: [],
-  };
+  // const stepValidations: Record<number, any[]> = {
+  //   1: [pat.value],
+  //   2: [pat.value, originBranch.value, targetBranch.value],
+  //   3: [pat.value, originBranch.value, targetBranch.value, template.value.id],
+  //   4: [],
+  // };
 
-  for (const field of stepValidations[stepEntity.stepCount]) {
-    if (!field || !field.length) return;
-  }
+  // for (const field of stepValidations[stepEntity.stepCount]) {
+  //   if (!field || !field.length) return;
+  // }
 
   return (process.step = actionView);
 };
@@ -64,7 +68,7 @@ const handleChangeStep = (action: "preview" | "next") => {
 
 <template>
   <footer
-    class="fixed bottom-0 w-screen h-20 flex justify-center items-center gap-10"
+    class="bg-white/30 backdrop-blur-md fixed bottom-0 w-screen h-20 flex justify-center items-center gap-10"
   >
     <Button
       @click="() => handleChangeStep('preview')"

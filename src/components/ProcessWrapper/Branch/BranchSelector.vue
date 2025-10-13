@@ -14,46 +14,98 @@ import SelectGroup from "@/components/ui/select/SelectGroup.vue";
 import SelectItem from "@/components/ui/select/SelectItem.vue";
 import { useProcess } from "@/stores/process.store";
 import { storeToRefs } from "pinia";
+import { onMounted, ref } from "vue";
+import GitLabService from "@/service/gitlabApi";
+import { ApiError } from "@/service/clientApi";
+import { toast } from "vue-sonner";
+import type { GroupType, ProjectType } from "@/types/process";
 
 const process = useProcess();
 
-const { project, originBranch, targetBranch } = storeToRefs(process);
+const { pat, project, group, originBranch, targetBranch } =
+  storeToRefs(process);
+const gitlabService = new GitLabService();
 
-const projects = [
+const projects = ref([
   {
     label: "Archetype-1",
     id: 1,
   },
-  {
-    label: "bbva-1",
-    id: 2,
-  },
-  {
-    label: "nestle-1",
-    id: 3,
-  },
-  {
-    label: "chingones-1",
-    id: 4,
-  },
-];
+]);
 
-const branches = ["main", "dev", "qa"];
+const groups = ref([
+  {
+    label: "",
+    id: 1,
+  },
+]);
 
-const templates = [
-  {
-    label: "DEV",
-    value: 1,
-  },
-  {
-    label: "QA",
-    value: 2,
-  },
-  {
-    label: "MAIN",
-    value: 3,
-  },
-];
+const branches = ref(["test"]);
+
+const handleGetProjectBranches = async (projectId: number) => {
+  try {
+    debugger;
+    const getBranches = await gitlabService.getProjectBranches(projectId);
+
+    if (Array.isArray(getBranches) && getBranches.length) {
+      branches.value = getBranches.map((branch) => branch.name);
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      toast.error(error.message);
+    }
+  }
+};
+
+const handleGetProjects = async (groupId: number) => {
+  try {
+    const getProjects = await gitlabService.getProjectsFromGroup(groupId);
+
+    if (Array.isArray(getProjects) && getProjects.length) {
+      projects.value = getProjects.map((project) => ({
+        id: project.id,
+        label: project.name,
+      }));
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      toast.error(error.message);
+    }
+  }
+};
+
+const handleGetGroups = async () => {
+  try {
+    const getGroups: any[] = await gitlabService.getGroups();
+
+    if (Array.isArray(getGroups) && getGroups.length > 0) {
+      groups.value = getGroups.map((group) => ({
+        id: group.id,
+        label: group?.name,
+      }));
+    }
+  } catch (error) {
+    if (error instanceof ApiError) {
+      toast.error(error.message);
+    }
+  }
+};
+
+const handleSelectGroup = (group: GroupType) => {
+  process.group = group;
+
+  handleGetProjects(group.id);
+};
+
+const handleSelectProject = (project: ProjectType) => {
+  process.project = project;
+  handleGetProjectBranches(project.id);
+};
+
+onMounted(() => {
+  gitlabService.setPAT(pat.value);
+  handleGetGroups();
+});
 </script>
 
 <template>
@@ -70,23 +122,43 @@ const templates = [
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div class="grid gap-2">
-          <Label>Project</Label>
-          <Select :model-value="project.id">
-            <SelectTrigger class="w-5/10">
-              <SelectValue placeholder="Select a branch" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup v-for="projectMapped in projects">
-                <SelectItem
-                  @click="() => (project.id = projectMapped.id)"
-                  :value="projectMapped.id"
-                >
-                  {{ projectMapped.label }}</SelectItem
-                >
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+        <div class="grid grid-cols-1 md:grid-cols-2 mt-10 w-full gap-5">
+          <div class="grid gap-2">
+            <Label>Group</Label>
+            <Select :model-value="group.id">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a branch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup v-for="groupMapped in groups">
+                  <SelectItem
+                    @click="handleSelectGroup(groupMapped)"
+                    :value="groupMapped.id"
+                  >
+                    {{ groupMapped.label }}</SelectItem
+                  >
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+          <div class="grid gap-2">
+            <Label>Project</Label>
+            <Select :model-value="project.id">
+              <SelectTrigger class="w-full">
+                <SelectValue placeholder="Select a branch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup v-for="projectMapped in projects">
+                  <SelectItem
+                    @click="handleSelectProject(projectMapped)"
+                    :value="projectMapped.id"
+                  >
+                    {{ projectMapped.label }}</SelectItem
+                  >
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 mt-10 w-full gap-5">
           <div class="grid gap-2">
@@ -120,21 +192,6 @@ const templates = [
                     :value="branch"
                   >
                     {{ branch }}</SelectItem
-                  >
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div class="grid gap-2">
-            <Label> Default Template </Label>
-            <Select>
-              <SelectTrigger class="w-full">
-                <SelectValue placeholder="Select a branch" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup v-for="template in templates">
-                  <SelectItem :value="template.value">
-                    {{ template.label }}</SelectItem
                   >
                 </SelectGroup>
               </SelectContent>

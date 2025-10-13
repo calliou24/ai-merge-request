@@ -7,6 +7,7 @@ import TemplateSelector from "./Template/TemplateSelector.vue";
 import ChatAi from "./Chat/ChatAi.vue";
 import Preview from "./Preview/Preview.vue";
 import StickedFooter from "../StickedFooter/StickedFooter.vue";
+import "vue-sonner/style.css";
 
 const process = useProcess();
 const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
@@ -14,8 +15,15 @@ const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
 </script>
 
 <template>
-  <main class="grid place-items-center w-screen h-screen">
-    <div class="w-10/12 h-fit-content min-w[500px] overflow-auto">
+  <main class="flex flex-col items-center w-screen h-screen">
+    <Toaster
+      :toastOptions="{
+        style: { background: '#fda4af' },
+        class: 'my-toast',
+        descriptionClass: 'my-toast-description',
+      }"
+    />
+    <div class="w-10/12 max-w-[800px] mt-10 pb-25">
       <Token v-if="isTokenStep" />
       <BranchSelector v-if="isBranchStep" />
       <TemplateSelector v-if="isTemplateStep" />
