@@ -14,97 +14,69 @@ import SelectGroup from "@/components/ui/select/SelectGroup.vue";
 import SelectItem from "@/components/ui/select/SelectItem.vue";
 import { useProcess } from "@/stores/process.store";
 import { storeToRefs } from "pinia";
-import { onMounted, ref } from "vue";
-import GitLabService from "@/service/gitlabApi";
-import { ApiError } from "@/service/clientApi";
+import { onMounted, watch } from "vue";
+import { gitlabService } from "@/service/gitlabApi";
+import type { AcceptableValue } from "reka-ui";
+import { useRepo } from "@/stores/repo.store";
 import { toast } from "vue-sonner";
-import type { GroupType, ProjectType } from "@/types/process";
+import { Loader2 } from "lucide-vue-next";
 
 const process = useProcess();
+const repo = useRepo();
 
 const { pat, project, group, originBranch, targetBranch } =
   storeToRefs(process);
-const gitlabService = new GitLabService();
 
-const projects = ref([
-  {
-    label: "Archetype-1",
-    id: 1,
-  },
-]);
+const { isLoading, error, groups, projects, branches } = storeToRefs(repo);
 
-const groups = ref([
-  {
-    label: "",
-    id: 1,
-  },
-]);
+const handleSelectGroup = (groupId: AcceptableValue) => {
+  if (typeof groupId != "number") return;
 
-const branches = ref(["test"]);
+  process.group = groupId;
+  process.project = 0;
 
-const handleGetProjectBranches = async (projectId: number) => {
-  try {
-    debugger;
-    const getBranches = await gitlabService.getProjectBranches(projectId);
+  repo.getProjects(groupId);
+};
 
-    if (Array.isArray(getBranches) && getBranches.length) {
-      branches.value = getBranches.map((branch) => branch.name);
-    }
-  } catch (error) {
-    if (error instanceof ApiError) {
-      toast.error(error.message);
-    }
+const handleSelectProject = (projectId: AcceptableValue) => {
+  if (typeof projectId != "number") return;
+
+  process.project = projectId;
+  process.originBranch = "";
+  process.targetBranch = "";
+  repo.getProjectBranches(projectId);
+};
+
+const handleSelectBranches = (
+  type: "TARGET" | "ORIGIN",
+  value: AcceptableValue
+) => {
+  if (typeof value != "string") return;
+
+  switch (type) {
+    case "ORIGIN":
+      process.originBranch = value;
+      break;
+    case "TARGET":
+      process.targetBranch = value;
+      break;
+    default:
+      break;
   }
-};
-
-const handleGetProjects = async (groupId: number) => {
-  try {
-    const getProjects = await gitlabService.getProjectsFromGroup(groupId);
-
-    if (Array.isArray(getProjects) && getProjects.length) {
-      projects.value = getProjects.map((project) => ({
-        id: project.id,
-        label: project.name,
-      }));
-    }
-  } catch (error) {
-    if (error instanceof ApiError) {
-      toast.error(error.message);
-    }
-  }
-};
-
-const handleGetGroups = async () => {
-  try {
-    const getGroups: any[] = await gitlabService.getGroups();
-
-    if (Array.isArray(getGroups) && getGroups.length > 0) {
-      groups.value = getGroups.map((group) => ({
-        id: group.id,
-        label: group?.name,
-      }));
-    }
-  } catch (error) {
-    if (error instanceof ApiError) {
-      toast.error(error.message);
-    }
-  }
-};
-
-const handleSelectGroup = (group: GroupType) => {
-  process.group = group;
-
-  handleGetProjects(group.id);
-};
-
-const handleSelectProject = (project: ProjectType) => {
-  process.project = project;
-  handleGetProjectBranches(project.id);
 };
 
 onMounted(() => {
+  if (pat.value == "") return toast.error("Personal Access Token not found");
+
+  if (groups.value.length != 0) return;
+
+  //
   gitlabService.setPAT(pat.value);
-  handleGetGroups();
+  repo.getGroups();
+});
+
+watch(error, (err) => {
+  if (err && err.message) toast.error(err.message);
 });
 </script>
 
@@ -114,45 +86,52 @@ onMounted(() => {
     description="Choose the repository and branches for your merge request"
   />
   <section class="mt-10">
-    <Card>
+    <Card class="p-0 pt-5 overflow-hidden">
       <CardHeader>
         <CardTitle>Respository</CardTitle>
         <CardDescription>
           Select the GitLab project for this merge request
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div class="grid grid-cols-1 md:grid-cols-2 mt-10 w-full gap-5">
+      <CardContent class="relative pt-5 pb-5">
+        <div
+          v-if="isLoading"
+          class="absolute w-full h-full bg-white/80 left-0 top-0 grid place-items-center"
+        >
+          <Loader2 class="animate-spin" />
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 mt-5 w-full gap-5">
           <div class="grid gap-2">
             <Label>Group</Label>
-            <Select :model-value="group.id">
+            <Select
+              :model-value="group"
+              @update:model-value="handleSelectGroup"
+              :disabled="isLoading"
+            >
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="Select a branch" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup v-for="groupMapped in groups">
-                  <SelectItem
-                    @click="handleSelectGroup(groupMapped)"
-                    :value="groupMapped.id"
-                  >
+                  <SelectItem :key="groupMapped.id" :value="groupMapped.id">
                     {{ groupMapped.label }}</SelectItem
                   >
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-          <div class="grid gap-2">
+          <div :hidden="group == 0" class="grid gap-2">
             <Label>Project</Label>
-            <Select :model-value="project.id">
-              <SelectTrigger class="w-full">
+            <Select
+              :model-value="project"
+              @update:model-value="handleSelectProject"
+            >
+              <SelectTrigger c class="w-full">
                 <SelectValue placeholder="Select a branch" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup v-for="projectMapped in projects">
-                  <SelectItem
-                    @click="handleSelectProject(projectMapped)"
-                    :value="projectMapped.id"
-                  >
+                  <SelectItem :key="projectMapped.id" :value="projectMapped.id">
                     {{ projectMapped.label }}</SelectItem
                   >
                 </SelectGroup>
@@ -160,17 +139,30 @@ onMounted(() => {
             </Select>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 mt-10 w-full gap-5">
+
+        <div
+          :hidden="project == 0"
+          class="grid grid-cols-1 md:grid-cols-2 mt-10 w-full gap-5 relative"
+        >
+          <div
+            v-if="branches.length === 1"
+            class="absolute bg-white/80 w-full h-full top-0 left-0"
+          />
           <div class="grid gap-2">
             <Label> Origin </Label>
-            <Select :model-value="originBranch">
+            <Select
+              v-model="originBranch"
+              @update:modelValue="
+                (value) => handleSelectBranches('ORIGIN', value)
+              "
+            >
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="Select a branch" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup v-for="branch in branches">
                   <SelectItem
-                    @click="() => (process.originBranch = branch)"
+                    :disabled="branch == targetBranch"
                     :value="branch"
                   >
                     {{ branch }}</SelectItem
@@ -181,14 +173,19 @@ onMounted(() => {
           </div>
           <div class="grid gap-2">
             <Label> Target </Label>
-            <Select :model-value="targetBranch">
+            <Select
+              v-model="targetBranch"
+              @update:modelValue="
+                (value) => handleSelectBranches('TARGET', value)
+              "
+            >
               <SelectTrigger class="w-full">
                 <SelectValue placeholder="Select a branch" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup v-for="branch in branches">
                   <SelectItem
-                    @click="() => (process.targetBranch = branch)"
+                    :disabled="branch == originBranch"
                     :value="branch"
                   >
                     {{ branch }}</SelectItem
@@ -198,6 +195,13 @@ onMounted(() => {
             </Select>
           </div>
         </div>
+        <p
+          v-if="project != 0 && !isLoading && branches.length === 1"
+          class="text-gray-600 text-center mt-5"
+        >
+          This project only have <b> one </b>
+          branch
+        </p>
       </CardContent>
     </Card>
   </section>

@@ -7,6 +7,7 @@ import TemplateSelector from "./Template/TemplateSelector.vue";
 import ChatAi from "./Chat/ChatAi.vue";
 import Preview from "./Preview/Preview.vue";
 import StickedFooter from "../StickedFooter/StickedFooter.vue";
+import { Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
 
 const process = useProcess();

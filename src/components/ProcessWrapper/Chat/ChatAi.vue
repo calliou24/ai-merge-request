@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import Textarea from "@/components/ui/textarea/Textarea.vue";
 import SectionTitle from "../Common/SectionTitle.vue";
+import { useProcess } from "@/stores/process.store";
+import { storeToRefs } from "pinia";
+import type { AcceptableValue } from "reka-ui";
+
+const process = useProcess();
+const { aiContext } = storeToRefs(process);
 </script>
 <template>
   <SectionTitle
@@ -9,6 +15,8 @@ import SectionTitle from "../Common/SectionTitle.vue";
   />
   <section>
     <Textarea
+      :model-value="aiContext"
+      @update:model-value="(value: AcceptableValue) => {typeof value == 'string' ? (process.aiContext = value): ''}"
       class="min-h-50 mt-10 p-5 rounded-2xl resize-none bg-gray-50 border-transparent"
       placeholder="Write a brief description of the content in your Merge Request "
     />

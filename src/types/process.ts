@@ -9,16 +9,6 @@ export const ProcessStepEnum = {
 export type ProcessStepType =
   (typeof ProcessStepEnum)[keyof typeof ProcessStepEnum];
 
-export type GroupType = {
-  id: number;
-  label: string;
-};
-
-export type ProjectType = {
-  id: number;
-  label: string;
-};
-
 export type TemplateType = {
   id: number;
   title: string;

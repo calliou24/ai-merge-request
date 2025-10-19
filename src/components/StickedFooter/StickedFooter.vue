@@ -6,7 +6,8 @@ import { storeToRefs } from "pinia";
 
 const process = useProcess();
 
-const { step, originBranch, targetBranch } = storeToRefs(process);
+const { pat, step, template, originBranch, targetBranch, aiContext } =
+  storeToRefs(process);
 
 type StepActionsType = {
   preview: ProcessStepType;
@@ -47,20 +48,26 @@ const handleChangeStep = (action: "preview" | "next") => {
 
   const actionView = stepEntity[action];
 
-  // if (actionView == "") return;
+  if (actionView == "") return;
 
-  // if (action == "preview") return (process.step = actionView);
+  if (action == "preview") return (process.step = actionView);
 
-  // const stepValidations: Record<number, any[]> = {
-  //   1: [pat.value],
-  //   2: [pat.value, originBranch.value, targetBranch.value],
-  //   3: [pat.value, originBranch.value, targetBranch.value, template.value.id],
-  //   4: [],
-  // };
+  const stepValidations: Record<number, any[]> = {
+    1: [pat.value],
+  };
 
-  // for (const field of stepValidations[stepEntity.stepCount]) {
-  //   if (!field || !field.length) return;
-  // }
+  stepValidations[2] = [
+    ...stepValidations[1],
+    originBranch.value,
+    targetBranch.value,
+  ];
+  stepValidations[3] = [...stepValidations[2], template.value.id];
+  stepValidations[4] = [...stepValidations[3], aiContext.value];
+
+  for (const field of stepValidations[stepEntity.stepCount]) {
+    if ((!field || !field.length) && typeof field != "number") return;
+    if (typeof field == "number" && isNaN(field)) return;
+  }
 
   return (process.step = actionView);
 };

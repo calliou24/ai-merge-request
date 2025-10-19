@@ -5,7 +5,7 @@ import { ref, type ButtonHTMLAttributes } from "vue";
 
 const { onClick } = defineProps<{
   buttonProperties: ButtonHTMLAttributes;
-  onClick: () => Promise<void>;
+  onClick: () => any;
 }>();
 
 const loading = ref(false);

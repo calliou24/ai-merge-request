@@ -13,6 +13,9 @@ import { ref } from "vue";
 import ButtonWithLoader from "@/components/ui/button/ButtonWithLoader.vue";
 import { useProcess } from "@/stores/process.store";
 import { storeToRefs } from "pinia";
+import { gitlabService } from "@/service/gitlabApi";
+import { ApiError } from "@/service/clientApi";
+import { toast } from "vue-sonner";
 
 const process = useProcess();
 
@@ -21,7 +24,22 @@ const { pat } = storeToRefs(process);
 let isLogged = ref(false);
 
 const handleAuth = async () => {
-  isLogged.value = true;
+  try {
+    const isValid = await gitlabService.validateToken<{ id: number }>(
+      pat.value
+    );
+
+    if (isValid.id && isValid.id !== 0) {
+      isLogged.value = true;
+    }
+  } catch (error) {
+    if (!(error instanceof ApiError)) return;
+
+    if (error.status == 401)
+      return toast.error("Invalid Personal Access Token");
+
+    toast.error(error.message);
+  }
 };
 </script>
 

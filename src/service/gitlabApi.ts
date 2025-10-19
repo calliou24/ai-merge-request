@@ -7,6 +7,15 @@ export default class GitLabService extends ClientApi {
     this.pat = PAT;
   }
 
+  async validateToken<T>(pat: string) {
+    return this.request<T>("/personal_access_tokens/self", {
+      method: "GET",
+      headers: {
+        "PRIVATE-TOKEN": pat,
+      },
+    });
+  }
+
   async getGroups<T>() {
     return this.request<T>("/groups", {
       method: "GET",
@@ -33,3 +42,5 @@ export default class GitLabService extends ClientApi {
     });
   }
 }
+
+export const gitlabService = new GitLabService();
