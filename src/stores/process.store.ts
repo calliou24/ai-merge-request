@@ -14,13 +14,13 @@ export type ProcessStateType = {
 
 export const useProcess = defineStore("process", {
   state: (): ProcessStateType => ({
-    step: ProcessStepEnum.TEMPLATE,
+    step: ProcessStepEnum.TOKEN,
     pat: "",
     project: 0,
     group: 0,
     originBranch: "",
     targetBranch: "",
-    template: 0,
+    template: 9,
     aiContext: "",
   }),
   getters: {

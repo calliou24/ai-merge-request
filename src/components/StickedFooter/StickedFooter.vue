@@ -61,7 +61,7 @@ const handleChangeStep = (action: "preview" | "next") => {
     originBranch.value,
     targetBranch.value,
   ];
-  stepValidations[3] = [...stepValidations[2], template.value.id];
+  stepValidations[3] = [...stepValidations[2], template.value];
   stepValidations[4] = [...stepValidations[3], aiContext.value];
 
   for (const field of stepValidations[stepEntity.stepCount]) {
