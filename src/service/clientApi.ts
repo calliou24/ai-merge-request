@@ -15,8 +15,8 @@ export class ApiError extends Error {
 export class ClientApi {
   private baseUrl: string;
 
-  constructor() {
-    this.baseUrl = ApiConfig.GITLAB_API_URL;
+  constructor(url?: string) {
+    this.baseUrl = url ?? ApiConfig.GITLAB_API_URL;
   }
 
   async request<T>(endpoint: string, options: RequestInit): Promise<T> {

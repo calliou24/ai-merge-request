@@ -7,48 +7,57 @@ import CardDescription from "@/components/ui/card/CardDescription.vue";
 import CardContent from "@/components/ui/card/CardContent.vue";
 import { useProcess } from "@/stores/process.store";
 import { storeToRefs } from "pinia";
-import type { TemplateType } from "@/types/process";
+import { onMounted } from "vue";
+import { useTemplates } from "@/stores/templates.store";
+import type { TemplateType } from "@/types/template";
 
 const process = useProcess();
 
 const { template } = storeToRefs(process);
 
-const templates: TemplateType[] = [
-  {
-    id: 1,
-    title: "Feature",
-    description:
-      "This description helps to know that does the template its for.",
-  },
-  {
-    id: 2,
-    title: "Qa",
-    description:
-      "This description helps to know that does the template its for.",
-  },
-  {
-    id: 13,
-    title: "Sync branches",
-    description:
-      "This description helps to know that does the template its for.",
-  },
-  {
-    id: 4,
-    title: "Delete Feature",
-    description:
-      "This description helps to know that does the template its for.",
-  },
-  {
-    id: 5,
-    title: "Hot fix",
-    description:
-      "This description helps to know that does the template its for.",
-  },
-];
+const templatesStore = useTemplates();
+const { templates } = storeToRefs(templatesStore);
+
+// const templates: TemplateType[] = [
+//   {
+//     id: 1,
+//     title: "Feature",
+//     description:
+//       "This description helps to know that does the template its for.",
+//   },
+//   {
+//     id: 2,
+//     title: "Qa",
+//     description:
+//       "This description helps to know that does the template its for.",
+//   },
+//   {
+//     id: 13,
+//     title: "Sync branches",
+//     description:
+//       "This description helps to know that does the template its for.",
+//   },
+//   {
+//     id: 4,
+//     title: "Delete Feature",
+//     description:
+//       "This description helps to know that does the template its for.",
+//   },
+//   {
+//     id: 5,
+//     title: "Hot fix",
+//     description:
+//       "This description helps to know that does the template its for.",
+//   },
+// ];
 
 const handleSelectTemplate = (newTemplate: TemplateType) => {
-  process.template = newTemplate;
+  process.template = newTemplate.id;
 };
+
+onMounted(() => {
+  templatesStore.getTemplates();
+});
 </script>
 <template>
   <SectionTitle
@@ -66,13 +75,13 @@ const handleSelectTemplate = (newTemplate: TemplateType) => {
         >
       </CardHeader>
       <CardContent>
-        <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <li
             @click="handleSelectTemplate(templateItem)"
             v-for="templateItem in templates"
             :class="[
               'h-40 bg-gray-50 hover:bg-purple-50 border-2  hover:border-purple-500 rounded-xl p-5 min-w-20 select-none flex flex-col gap-1',
-              template.id == templateItem.id
+              template == templateItem.id
                 ? ' bg-purple-50 border-purple-500'
                 : 'border-transparent',
             ]"

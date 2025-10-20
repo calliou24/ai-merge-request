@@ -8,9 +8,3 @@ export const ProcessStepEnum = {
 
 export type ProcessStepType =
   (typeof ProcessStepEnum)[keyof typeof ProcessStepEnum];
-
-export type TemplateType = {
-  id: number;
-  title: string;
-  description: string;
-};
