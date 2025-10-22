@@ -70,9 +70,9 @@ onMounted(() => {
           <p class="p-2 bg-gray-100 rounded-lg">
             {{ selectedTemplate?.title }}
           </p>
-          <p class="p-2 bg-gray-100 rounded-lg">
+          <div class="p-2 bg-gray-100 rounded-lg">
             <pre><code>{{ selectedTemplate?.template }}</code></pre>
-          </p>
+          </div>
         </div>
       </CardContent>
     </Card>

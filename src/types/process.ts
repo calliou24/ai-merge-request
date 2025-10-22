@@ -4,6 +4,7 @@ export const ProcessStepEnum = {
   TEMPLATE: "TEMPLATE",
   CHAT: "CHAT",
   REVIEW: "REVIEW",
+  CREATION: "CREATION"
 };
 
 export type ProcessStepType =

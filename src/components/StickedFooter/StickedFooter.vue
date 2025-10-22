@@ -38,9 +38,14 @@ const StepsActions: Record<ProcessStepType, StepActionsType> = {
   },
   [ProcessStepEnum.REVIEW]: {
     preview: ProcessStepEnum.CHAT,
-    next: ProcessStepEnum.REVIEW,
+    next: ProcessStepEnum.CREATION,
     stepCount: 4,
   },
+  [ProcessStepEnum.CREATION]: { 
+    preview: ProcessStepEnum.REVIEW,
+    next: "",
+    stepCount: 5
+  }
 };
 
 const handleChangeStep = (action: "preview" | "next") => {
@@ -63,6 +68,7 @@ const handleChangeStep = (action: "preview" | "next") => {
   ];
   stepValidations[3] = [...stepValidations[2], template.value];
   stepValidations[4] = [...stepValidations[3], aiContext.value];
+  stepValidations[5] = [];
 
   for (const field of stepValidations[stepEntity.stepCount]) {
     if ((!field || !field.length) && typeof field != "number") return;
@@ -86,6 +92,7 @@ const handleChangeStep = (action: "preview" | "next") => {
     </Button>
     <p class="text-gray-500">Step {{ StepsActions[step].stepCount }} of 5</p>
     <Button
+      :v-if="step != ProcessStepEnum.REVIEW"
       :disabled="
         originBranch == targetBranch &&
         originBranch.length &&

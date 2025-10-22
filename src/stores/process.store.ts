@@ -10,6 +10,7 @@ export type ProcessStateType = {
   targetBranch: string;
   template: number;
   aiContext: string;
+
 };
 
 export const useProcess = defineStore("process", {
@@ -29,6 +30,7 @@ export const useProcess = defineStore("process", {
     isTemplateStep: (s) => s.step == ProcessStepEnum.TEMPLATE,
     isChatStep: (s) => s.step == ProcessStepEnum.CHAT,
     isReviewStep: (s) => s.step == ProcessStepEnum.REVIEW,
+    isCreationStep: (s) => s.step == ProcessStepEnum.CREATION,
   },
   actions: {},
 });

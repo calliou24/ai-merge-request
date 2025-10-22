@@ -19,16 +19,23 @@ export class ClientApi {
     this.baseUrl = url ?? ApiConfig.GITLAB_API_URL;
   }
 
-  async request<T>(endpoint: string, options: RequestInit): Promise<T> {
+  async request<T>(endpoint: string, options: RequestInit, body?: FormData | string): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
-    const config: RequestInit = {
+    let config: RequestInit = {
       headers: {
         "Content-Type": "application/json",
         ...options.headers,
       },
       method: options.method,
     };
+
+    if (body) { 
+      config = {
+        ...config,
+        body
+      }
+    }
 
     const response = await fetch(url, config);
 

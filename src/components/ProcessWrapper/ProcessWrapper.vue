@@ -9,9 +9,10 @@ import Preview from "./Preview/Preview.vue";
 import StickedFooter from "../StickedFooter/StickedFooter.vue";
 import { Toaster } from "vue-sonner";
 import "vue-sonner/style.css";
+import Creation from "./Creation/Creation.vue";
 
 const process = useProcess();
-const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
+const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep, isCreationStep } =
   storeToRefs(process);
 </script>
 
@@ -30,6 +31,7 @@ const { isTokenStep, isBranchStep, isTemplateStep, isChatStep, isReviewStep } =
       <TemplateSelector v-if="isTemplateStep" />
       <ChatAi v-if="isChatStep" />
       <Preview v-if="isReviewStep" />
+      <Creation v-if="isCreationStep"/>
     </div>
 
     <StickedFooter />
