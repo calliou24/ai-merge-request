@@ -8,14 +8,14 @@ export default class MergeRequestApi extends ClientApi {
     template_id,
     origin_branch,
     target_branch,
-    pat
+    pat,
   }: {
     project_id: number;
-    contextAI: string
-    template_id: number,
+    contextAI: string;
+    template_id: number;
     origin_branch: string;
     target_branch: string;
-    pat: string
+    pat: string;
   }) {
     const body = JSON.stringify({
       project_id,
@@ -24,9 +24,9 @@ export default class MergeRequestApi extends ClientApi {
       context_ai: contextAI,
       pat,
       template_id,
-      provider_id: 2,
-      model: "qwen-3-coder-480b",
-    })
+      provider_id: 1,
+      model: "z-ai/glm-4.5-air:free",
+    });
     return this.request<T>("/merge-request", { method: "POST" }, body);
   }
 
@@ -36,23 +36,23 @@ export default class MergeRequestApi extends ClientApi {
     description,
     origin_branch,
     target_branch,
-    pat
+    pat,
   }: {
     project_id: number;
     title: string;
     description: string;
     origin_branch: string;
     target_branch: string;
-    pat: string
+    pat: string;
   }) {
     const body = JSON.stringify({
       project_id,
-      origin_branch,
-      target_branch,
+      origin_branch: target_branch,
+      target_branch: origin_branch,
       title,
       description,
       pat,
-    })
+    });
     return this.request<T>("/merge-request/create", { method: "POST" }, body);
   }
 }

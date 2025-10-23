@@ -41,11 +41,11 @@ const StepsActions: Record<ProcessStepType, StepActionsType> = {
     next: ProcessStepEnum.CREATION,
     stepCount: 4,
   },
-  [ProcessStepEnum.CREATION]: { 
+  [ProcessStepEnum.CREATION]: {
     preview: ProcessStepEnum.REVIEW,
     next: "",
-    stepCount: 5
-  }
+    stepCount: 5,
+  },
 };
 
 const handleChangeStep = (action: "preview" | "next") => {
@@ -92,7 +92,7 @@ const handleChangeStep = (action: "preview" | "next") => {
     </Button>
     <p class="text-gray-500">Step {{ StepsActions[step].stepCount }} of 5</p>
     <Button
-      :v-if="step != ProcessStepEnum.REVIEW"
+      :hidden="step == ProcessStepEnum.CREATION"
       :disabled="
         originBranch == targetBranch &&
         originBranch.length &&
@@ -102,5 +102,6 @@ const handleChangeStep = (action: "preview" | "next") => {
       @click="() => handleChangeStep('next')"
       >Next</Button
     >
+    <div class="w-30" :hidden="step != ProcessStepEnum.CREATION" />
   </footer>
 </template>

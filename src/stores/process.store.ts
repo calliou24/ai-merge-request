@@ -5,7 +5,7 @@ export type ProcessStateType = {
   step: ProcessStepType;
   pat: string;
   project: number;
-  group: number;
+  projectUrl: string
   originBranch: string;
   targetBranch: string;
   template: number;
@@ -18,7 +18,7 @@ export const useProcess = defineStore("process", {
     step: ProcessStepEnum.TOKEN,
     pat: "",
     project: 0,
-    group: 0,
+    projectUrl:'',
     originBranch: "",
     targetBranch: "",
     template: 9,

@@ -8,16 +8,11 @@ import { storeToRefs } from "pinia";
 import { useTemplates } from "@/stores/templates.store";
 import { onMounted, ref } from "vue";
 import type { TemplateType } from "@/types/template";
-import { useRepo } from "@/stores/repo.store";
 import type { ProjectType } from "@/types/repo";
 
 const process = useProcess();
 
-const {  project, originBranch, targetBranch, template,  } =
-  storeToRefs(process);
-
-const repo = useRepo();
-const { projects } = storeToRefs(repo);
+const { originBranch, targetBranch, template } = storeToRefs(process);
 
 const templatesStore = useTemplates();
 const { templates } = storeToRefs(templatesStore);
@@ -28,10 +23,6 @@ const selectedProject = ref<ProjectType>();
 onMounted(() => {
   selectedTemplate.value = templates.value.find(
     (templateItem) => templateItem.id === template.value
-  );
-
-  selectedProject.value = projects.value.find(
-    (projectItem) => projectItem.id === project.value
   );
 });
 </script>
@@ -45,7 +36,7 @@ onMounted(() => {
       <CardHeader>
         <h2 class="text-2xl">
           <b>
-            {{ selectedProject?.label }}
+            {{ selectedProject?.name }}
           </b>
         </h2>
         <div class="grid grid-cols-2 mt-5 mb-2 gap-5">

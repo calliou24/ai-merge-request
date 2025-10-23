@@ -16,17 +16,8 @@ export default class GitLabService extends ClientApi {
     });
   }
 
-  async getGroups<T>() {
-    return this.request<T>("/groups", {
-      method: "GET",
-      headers: {
-        Authorization: "Bearer " + this.pat,
-      },
-    });
-  }
-
-  async getProjectsFromGroup<T>(groupId: number = 70646888) {
-    return this.request<T>(`/groups/${groupId}/projects`, {
+  async getProject<T>(project_path: string) {
+    return this.request<T>(`/projects/${project_path}`, {
       method: "GET",
       headers: {
         Authorization: "Bearer " + this.pat,
