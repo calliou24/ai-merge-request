@@ -47,8 +47,8 @@ export default class MergeRequestApi extends ClientApi {
   }) {
     const body = JSON.stringify({
       project_id,
-      origin_branch: target_branch,
-      target_branch: origin_branch,
+      origin_branch: origin_branch,
+      target_branch: target_branch,
       title,
       description,
       pat,
